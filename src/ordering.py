@@ -1,3 +1,4 @@
+<<<<<<< HEAD:src/input.py
 from cmu_graphics import *
 import random
 
@@ -83,3 +84,7 @@ def onStep(app):
 
 cmu_graphics.run()
 
+=======
+#manages user interactions like mouse clicks, drag-and-drop for toppings, and navigating the order screen
+from cmu_graphics import *
+>>>>>>> 28210468c529ea69af8ca2379d132d645e589497:src/ordering.py
