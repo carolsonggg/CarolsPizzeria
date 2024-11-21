@@ -1,4 +1,3 @@
-<<<<<<< HEAD:src/input.py
 from cmu_graphics import *
 import random
 
@@ -6,8 +5,6 @@ def redrawAll(app):
     drawRect(0, 300, 400, 100, fill='brown')  
     drawRect(0, 0, 400, 300, fill='lightYellow') 
     drawRect(20, 250, 360, 30, fill='darkBrown') 
-
-redrawAll(app)
 
 class Person:
     def __init__(self, hair, skin, order):
@@ -82,9 +79,4 @@ def onStep(app):
             person.order.display(50, 300 + yOffset)
             yOffset += 50
 
-cmu_graphics.run()
-
-=======
-#manages user interactions like mouse clicks, drag-and-drop for toppings, and navigating the order screen
-from cmu_graphics import *
->>>>>>> 28210468c529ea69af8ca2379d132d645e589497:src/ordering.py
+runApp()
