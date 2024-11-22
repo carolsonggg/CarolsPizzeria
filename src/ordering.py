@@ -4,30 +4,29 @@ import random
 def onAppStart(app):
     app.newCustomer = randomPerson()
     app.order = app.newCustomer.getOrder()
-
+    app.level = 1
+    app.stepPerSecond = 1
 
 def redrawAll(app):
-    drawRect(0, 0, 400, 300, fill='cornSilk') 
-    drawRect(20, 250, 360, 70, fill='saddleBrown') 
+    drawRect(0, 0, 600, 500, fill='cornSilk') 
+    drawRect(20, 250, 500, 70, fill='saddleBrown') 
     drawLabel('Papa\'s Pizzeria', app.width/2, 100, font='Times New Roman')
-    app.newCustomer.draw()
-    app.order.display(70,20) #change later
+    drawPerson(app.newCustomer)
+    drawOrder(app.order, 70, 20) #change later
+
+def onStep(app):
+    app.newCustomer.patience -= 1
+    app.newCustomer.walk()
 
 class Person:
-    def __init__(self, hair, hairStyle, skin, order):
+    def __init__(self, hair, hairStyle, skin, shirt, order):
         self.hair = hair
         self.hairStyle = hairStyle
         self.skin = skin
+        self.shirt = shirt
         self.order = order
         self.x = random.randint(50, 350)
-    
-    def draw(self):
-        drawOval(self.x, 170, self.hairStyle[0], self.hairStyle[1], fill=self.hair)
-        drawCircle(self.x, 170, 15, fill=self.skin) 
-        drawOval(self.x, 200, 30, 60, fill=self.skin)
-        drawOval(self.x + 5, 170, 3, 5)
-        drawOval(self.x - 5, 170, 3, 5)
-        
+        self.patience = random.randint(100, 300)
     
     def walk(self):
         if self.x > 100:
@@ -36,12 +35,22 @@ class Person:
     def getOrder(self):
         return self.order
 
+def drawPerson(person):
+    if app.newCustomer.patience > 0:
+        drawOval(person.x, 170, person.hairStyle[0], person.hairStyle[1], fill=person.hair)
+        drawOval(person.x, 200, 30, 60, fill=person.shirt)
+        drawCircle(person.x, 170, 15, fill=person.skin) 
+        drawOval(person.x+5, 170, 3, 5)
+        drawOval(person.x-5, 170, 3, 5)
+        drawLabel(f'{person.patience}', person.x, 180)
+        
 def randomPerson():
     hairColors = ['black', 'brown', 'goldenrod', 'red']
     hairStyles = [[40,45], [40, 55]]
     skinColors = ['tan', 'bisque', 'saddleBrown', 'burlyWood']
+    shirtColors = ['blue','pink','green','orange','lightBlue', 'maroon']
     order = randomOrder()
-    return Person(random.choice(hairColors), random.choice(hairStyles), random.choice(skinColors), order)
+    return Person(random.choice(hairColors), random.choice(hairStyles), random.choice(skinColors), random.choice(shirtColors), order)
 
 class Order:
     def __init__(self, doneness, sauce, toppings, cuts):
@@ -50,21 +59,22 @@ class Order:
         self.toppings = toppings
         self.cuts = cuts
 
-    def display(self, x, y):
-        drawLabel(f"Crust: {self.doneness}", x, y, size=12, font='Times New Roman') #is this MVC violation?
-        drawLabel(f"Sauce: {self.sauce}", x, y + 15, size=12, font='Times New Roman')
-        drawLabel(f"Toppings: {', '.join(self.toppings)}", x, y + 30, size=12, font='Times New Roman')
-        drawLabel(f"Cuts: {self.cuts}", x, y + 45, size=12, font='Times New Roman')
+def drawOrder(order, x, y):
+    drawRect(x-50, y-15, 100, 80, fill='white')
+    drawLabel(f"Crust: {order.doneness}", x, y, size=12, font='Times New Roman') 
+    drawLabel(f"Sauce: {order.sauce}", x, y + 15, size=12, font='Times New Roman')
+    drawLabel(f"Tops: {', '.join(order.toppings)}", x, y + 30, size=12, font='Times New Roman')
+    drawLabel(f"Cuts: {order.cuts}", x, y + 45, size=12, font='Times New Roman')
 
 def randomOrder():
     doneness = random.choice(['light', 'medium', 'dark'])
     sauce = random.choice(['tomato', 'no sauce'])
-    toppings = random.sample(['mushrooms', 'pepperoni', 'cheese'], random.randint(1, 3))
+    toppings = random.sample(['mushrooms', 'pepperoni', 'cheese'], 1)
     cuts = random.choice([2, 4, 6, 8])
     return Order(doneness, sauce, toppings, cuts)
 
 
-dragging_receipt = None
+'''dragging_receipt = None
 def onMousePress(app, mouseX, mouseY):
     global dragging_receipt
     if 20 <= mouseX <= 380 and 250 <= mouseY <= 280:
@@ -78,21 +88,6 @@ def onMouseDrag(app, mouseX, mouseY):
 def onMouseRelease(app, mouseX, mouseY):
     global dragging_receipt
     if dragging_receipt:
-        dragging_receipt = None
-
-people = [randomPerson() for _ in range(5)]
-orders = []
-def onStep(app):
-    global people
-
-    for person in people:
-        person.walk()
-        person.draw()
-    
-    yOffset = 0
-    for person in people:
-        if person.x <= 100:  
-            person.order.display(50, 300 + yOffset)
-            yOffset += 50
+        dragging_receipt = None'''
 
 runApp()
