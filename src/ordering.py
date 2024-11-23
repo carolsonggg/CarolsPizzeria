@@ -5,18 +5,40 @@ def onAppStart(app):
     app.newCustomer = randomPerson()
     app.order = app.newCustomer.getOrder()
     app.level = 1
-    app.stepPerSecond = 1
+    app.ordersTaken = 0
+    app.stepsPerSecond = 15
+    app.numberOfCustomers = 1
+    app.showOrder = False
+    app.customers = []
+
 
 def redrawAll(app):
     drawRect(0, 0, 600, 500, fill='cornSilk') 
     drawRect(20, 250, 500, 70, fill='saddleBrown') 
     drawLabel('Papa\'s Pizzeria', app.width/2, 100, font='Times New Roman')
-    drawPerson(app.newCustomer)
-    drawOrder(app.order, 70, 20) #change later
+    drawPerson(app,app.newCustomer)
+    if app.ordersTaken == 1: 
+        x = 30
+    elif app.ordersTaken == 2:
+        x = 90
+    else:
+        x = 150
+    drawOrder(app, app.order, x, 10) 
+
+def onMousePress(app, mouseX, mouseY):
+    position = app.newCustomer.getPos()
+    if mouseX >= position-20 and mouseX <= position+20:
+        if mouseY >= 145 and mouseY <= 190:
+            app.showOrder = True
+            app.ordersTaken += 1
 
 def onStep(app):
     app.newCustomer.patience -= 1
-    app.newCustomer.walk()
+    if not app.showOrder:
+        app.newCustomer.walk()
+    if app.newCustomer.patience <= 0 and not app.showOrder: 
+        app.newCustomer = randomPerson()
+        app.ordersTaken = 0
 
 class Person:
     def __init__(self, hair, hairStyle, skin, shirt, order):
@@ -26,23 +48,31 @@ class Person:
         self.shirt = shirt
         self.order = order
         self.x = random.randint(50, 350)
-        self.patience = random.randint(100, 300)
+        self.patience = random.randint(500, 1000)
     
     def walk(self):
-        if self.x > 100:
-            self.x -= 2
+        if self.x < 100:
+            self.x += 10
+        if self.x > 400:
+            self.x -= 10
+        else:
+            self.x += random.randint(-25, 25)
+     
+    def getPos(self):
+        return self.x
     
     def getOrder(self):
         return self.order
 
-def drawPerson(person):
-    if app.newCustomer.patience > 0:
+def drawPerson(app, person):
+    if person.patience > 0:
         drawOval(person.x, 170, person.hairStyle[0], person.hairStyle[1], fill=person.hair)
         drawOval(person.x, 200, 30, 60, fill=person.shirt)
         drawCircle(person.x, 170, 15, fill=person.skin) 
         drawOval(person.x+5, 170, 3, 5)
         drawOval(person.x-5, 170, 3, 5)
-        drawLabel(f'{person.patience}', person.x, 180)
+        if not app.showOrder:
+            drawLabel(f'{person.patience}', person.x, 130)
         
 def randomPerson():
     hairColors = ['black', 'brown', 'goldenrod', 'red']
@@ -59,12 +89,13 @@ class Order:
         self.toppings = toppings
         self.cuts = cuts
 
-def drawOrder(order, x, y):
-    drawRect(x-50, y-15, 100, 80, fill='white')
-    drawLabel(f"Crust: {order.doneness}", x, y, size=12, font='Times New Roman') 
-    drawLabel(f"Sauce: {order.sauce}", x, y + 15, size=12, font='Times New Roman')
-    drawLabel(f"Tops: {', '.join(order.toppings)}", x, y + 30, size=12, font='Times New Roman')
-    drawLabel(f"Cuts: {order.cuts}", x, y + 45, size=12, font='Times New Roman')
+def drawOrder(app,order,x,y):
+    if app.showOrder == True:
+        drawRect(x, 5, 100, 80, fill='white')
+        drawLabel(f"Crust: {order.doneness}", x+50, y+15, size=12, font='Times New Roman') 
+        drawLabel(f"Sauce: {order.sauce}", x+50, y+30, size=12, font='Times New Roman')
+        drawLabel(f"Tops: {', '.join(order.toppings)}", x+50, y+45, size=12, font='Times New Roman')
+        drawLabel(f"Cuts: {order.cuts}", x+50, y+60, size=12, font='Times New Roman')
 
 def randomOrder():
     doneness = random.choice(['light', 'medium', 'dark'])
@@ -72,22 +103,5 @@ def randomOrder():
     toppings = random.sample(['mushrooms', 'pepperoni', 'cheese'], 1)
     cuts = random.choice([2, 4, 6, 8])
     return Order(doneness, sauce, toppings, cuts)
-
-
-'''dragging_receipt = None
-def onMousePress(app, mouseX, mouseY):
-    global dragging_receipt
-    if 20 <= mouseX <= 380 and 250 <= mouseY <= 280:
-        dragging_receipt = "receipt"
-
-def onMouseDrag(app, mouseX, mouseY):
-    global dragging_receipt
-    if dragging_receipt == "receipt":
-        drawRect(mouseX - 40, mouseY - 10, 80, 20, fill='white', border='black')
-
-def onMouseRelease(app, mouseX, mouseY):
-    global dragging_receipt
-    if dragging_receipt:
-        dragging_receipt = None'''
 
 runApp()
