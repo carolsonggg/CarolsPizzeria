@@ -1,5 +1,6 @@
 from cmu_graphics import *
 import math
+import random
 
 def onAppStart(app):
     app.stack = []  # Stack of uncooked pizza crusts
@@ -9,30 +10,32 @@ def onAppStart(app):
     app.draggingPizza = None
     app.timerThresholds = [30, 60, 90, 120]  # 4 levels (light, medium, dark, burnt), 30 seconds each
     app.timerAngles = [90, 180, 270, 360]  # Angles for the timer dial for each level
-    app.timerSpeed = 1  # Slower timer speed (degrees per second)
+    app.timerSpeed = 0.5  # Slower timer speed (degrees per second)
     app.dragOffsetX = 0
     app.dragOffsetY = 0
     app.popupVisible = False
 
     for _ in range(5):  # Add 5 uncooked crusts to the stack
-        app.stack.append({'state': 'uncooked', 'color': 'wheat'})
+        app.stack.append({'state': 'uncooked', 'color': 'wheat', 'x': 540, 'y': 50 + 40 * _})
 
 def redrawAll(app):
     drawRect(0, 0, 600, 500, fill='cornsilk')  # Background
 
     # Draw stack of uncooked pizza crusts
-    drawLabel("Pizza Stack", 540, 30, size=14, font='Times New Roman')
     for i in range(len(app.stack)):
-        drawCircle(540, 50 + 40 * i, 30, fill='wheat', border='black')
+        pizza = app.stack[i]
+        drawCircle(pizza['x'], pizza['y'], 30, fill=pizza['color'], border='black')
 
     # Draw ovens
-    for i in range(2):
-        for j in range(2):
+    for i in range(2):  # 2 rows
+        for j in range(2):  # 2 ovens per row
             x, y = 150 + j * 200, 100 + i * 200
-            drawOven(app, x, y, app.ovens[i * 2 + j])
+            # Adjust the y-position for the bottom row ovens (i == 1)
+            if i == 1:
+                y -= 50  # Adjust this value as needed
+            drawOven(app, x, y, app.ovens[i * 2 + j])  
 
     # Draw ready plate
-    drawLabel("Ready Plate", 100, 330, size=14, font='Times New Roman')
     drawCircle(100, 370, 40, fill='gold', border='black')
     for i, pizza in enumerate(app.readyPlate):
         drawCircle(100 + i * 30, 370, 20, fill=pizza['color'])
@@ -56,25 +59,32 @@ def drawOven(app, x, y, oven):
     # Circular oven body
     drawCircle(x, y, 50, fill='dimGray', border='black')
     
-    # Grills
+    # Grills (better visual)
     for i in range(-30, 40, 15):
         drawLine(x - 40, y + i, x + 40, y + i, fill='black', lineWidth=2)
 
-    # Fire effect if pizza present
+    # Fire effect (flames) when pizza is placed in the oven
     if oven['pizza']:
-        drawPolygon(x - 20, y + 40, x, y + 20, x + 20, y + 40, fill='orange', border='red', borderWidth=1)
+        drawFlames(x, y)
 
     # Pizza on grill (pizza will stay the same size)
     if oven['pizza']:
         drawCircle(x, y, 40, fill=oven['pizza']['color'], opacity=60)
 
-    # Timer dial
+    # Timer dial on the side of the oven
     drawCircle(x + 70, y, 20, fill='white', border='black')
     drawLine(x + 70, y, x + 70 + 15 * math.cos(math.radians(oven['angle'] - 90)),
              y + 15 * math.sin(math.radians(oven['angle'] - 90)), fill='red', lineWidth=2)
     for angle in app.timerAngles:
         drawLine(x + 70, y, x + 70 + 15 * math.cos(math.radians(angle - 90)),
                  y + 15 * math.sin(math.radians(angle - 90)), fill='black')
+
+def drawFlames(x, y):
+    # Flickering flame effect
+    for i in range(3):
+        flameX = x + random.randint(-10, 10)
+        flameY = y + random.randint(30, 45)
+        drawCircle(flameX, flameY, random.randint(5, 10), fill=random.choice(['orange', 'yellow', 'red', 'red']), opacity=70)
 
 def onStep(app):
     # Update oven timers
@@ -102,11 +112,12 @@ def updatePizzaState(app, oven):
 
 def onMousePress(app, mouseX, mouseY):
     # Check stack (pick up pizza from the stack)
-    if 520 <= mouseX <= 560 and 50 <= mouseY <= 100:
-        if app.stack:
-            app.draggingPizza = app.stack.pop()  # Pop a pizza from the stack
+    for pizza in app.stack:
+        if abs(mouseX - pizza['x']) < 30 and abs(mouseY - pizza['y']) < 30:
+            app.draggingPizza = pizza  # Pick up pizza
+            app.stack.remove(pizza)  # Remove from stack
             app.draggingPizza['x'], app.draggingPizza['y'] = mouseX, mouseY
-        return
+            return
 
     # Check ovens
     for oven in app.ovens:
@@ -127,8 +138,7 @@ def onMousePress(app, mouseX, mouseY):
 
     # Check trash can
     if 480 <= mouseX <= 520 and 360 <= mouseY <= 420:
-        if app.draggingPizza and app.draggingPizza['state'] == 'burnt':
-            app.draggingPizza = None  # Discard burnt pizza
+        app.draggingPizza = None  # Discard burnt pizza
 
 def onMouseDrag(app, mouseX, mouseY):
     if app.draggingPizza:
@@ -152,17 +162,7 @@ def onMouseRelease(app, mouseX, mouseY):
     if 60 <= mouseX <= 140 and 330 <= mouseY <= 410:
         if app.draggingPizza['state'] != 'burnt':
             app.readyPlate.append(app.draggingPizza)
-            app.popupVisible = True  # Show "Next Screen" pop-up
+            app.popupVisible = True
             app.draggingPizza = None
-            return
-
-    # Check trash can
-    if 480 <= mouseX <= 520 and 360 <= mouseY <= 420:
-        if app.draggingPizza['state'] == 'burnt':
-            app.draggingPizza = None
-
-    # Return to stack if not placed in any valid spot
-    app.stack.append(app.draggingPizza)
-    app.draggingPizza = None
 
 runApp()
