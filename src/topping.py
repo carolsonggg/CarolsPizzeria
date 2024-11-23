@@ -1,122 +1,165 @@
 from cmu_graphics import *
 
 def onAppStart(app):
-    app.pizzaRadius = 100
+    # Pizza properties
+    app.pizzaRadius = 120
     app.pizzaCenter = (200, 200)
-    app.sauceOutlineRadius = app.pizzaRadius - 10
-    app.draggingItem = None
+    app.sauceApplied = False
     app.placedToppings = []
     app.cuts = []
 
-    # Sauce data
-    app.sauceBottle = Rect(350, 50, 50, 100, fill='red', border='black')
-    app.isSauceDragging = False
-    app.sauceOutline = Circle(app.pizzaCenter[0], app.pizzaCenter[1], app.sauceOutlineRadius, 
-                          fill=None, border='darkRed', opacity=50)
-    app.sauceApplied = False
+    # Sauce bottle properties
+    app.sauceBottle = {
+        'x': 350,
+        'y': 90,
+        'width': 40,
+        'height': 80,
+        'dragging': False,
+        'defaultPos': (350, 90)
+    }
 
-    # Topping data
+    # Topping jars properties
     app.toppingJars = {
-    'pepperoni': Rect(350, 180, 50, 50, fill='brown', border='black'),
-    'mushroom': Rect(350, 250, 50, 50, fill='tan', border='black'),
-    'olive': Rect(350, 320, 50, 50, fill='black', border='white')
+        'pepperoni': {
+            'x': 350,
+            'y': 180,
+            'width': 40,
+            'height': 40,
+            'color': 'brown'
+        },
+        'mushroom': {
+            'x': 350,
+            'y': 250,
+            'width': 40,
+            'height': 40,
+            'color': 'tan'
+        },
+        'olive': {
+            'x': 350,
+            'y': 320,
+            'width': 40,
+            'height': 40,
+            'color': 'black'
+        }
     }
     app.selectedTopping = None
+    app.toppingDragging = False
 
-    # Pizza cutter
-    app.cutter = Rect(350, 400, 50, 20, fill='gray', border='black')
-    app.isCutterDragging = False
+    # Cutter properties
+    app.cutter = {
+        'x': 350,
+        'y': 410,
+        'width': 50,
+        'height': 20,
+        'dragging': False,
+        'defaultPos': (350, 410)
+    }
 
-# Draw pizza and pan
-def drawPizza():
-    Circle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius, fill='wheat')
-    Circle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius + 10, fill=None, border='black')
+    app.lastMousePos = None
 
-# Draw toppings
-def drawToppings():
+# Utility functions
+def resetObjectPosition(obj):
+    obj['x'], obj['y'] = obj['defaultPos']
+
+def isInsideCircle(x, y, cx, cy, radius):
+    return ((x - cx) ** 2 + (y - cy) ** 2) <= radius ** 2
+
+# Drawing functions
+def drawPizza(app):
+    # Draw pizza base
+    drawCircle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius, fill='wheat', border='black')
+    # Draw sauce if applied
+    if app.sauceApplied:
+        drawCircle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius - 10, fill='tomato', opacity=50)
+
+def drawToppings(app):
     for topping in app.placedToppings:
-        Circle(topping[0], topping[1], 10, fill=topping[2])
+        drawCircle(topping['x'], topping['y'], 10, fill=topping['color'])
 
-# Draw cuts
-def drawCuts():
+def drawCuts(app):
     for cut in app.cuts:
-        Line(cut[0][0], cut[0][1], cut[1][0], cut[1][1], fill='black', lineWidth=2)
+        drawLine(cut[0][0], cut[0][1], cut[1][0], cut[1][1], fill='black', lineWidth=2)
 
-# Sauce interaction
-def handleSauceDrag(mouseX, mouseY):
-    app.sauceBottle.centerX, app.sauceBottle.centerY = mouseX, mouseY
+def drawSauceBottle(app):
+    bottle = app.sauceBottle
+    drawRect(bottle['x'] - bottle['width'] / 2, bottle['y'] - bottle['height'] / 2,
+             bottle['width'], bottle['height'], fill='red', border='black')
 
-def handleSauceApply(mouseX, mouseY):
-    if distance(mouseX, mouseY, app.pizzaCenter[0], app.pizzaCenter[1]) <= app.sauceOutlineRadius:
-        app.sauceApplied = True
-        app.isSauceDragging = False
-        resetSauceBottlePosition()
+def drawToppingJars(app):
+    for jar in app.toppingJars.values():
+        drawRect(jar['x'] - jar['width'] / 2, jar['y'] - jar['height'] / 2,
+                 jar['width'], jar['height'], fill=jar['color'], border='black')
 
-def resetSauceBottlePosition():
-    app.sauceBottle.centerX, app.sauceBottle.centerY = 375, 100
+def drawCutter(app):
+    cutter = app.cutter
+    drawRect(cutter['x'] - cutter['width'] / 2, cutter['y'] - cutter['height'] / 2,
+             cutter['width'], cutter['height'], fill='gray', border='black')
 
-# Topping interaction
-def handleToppingDrag(mouseX, mouseY):
-    Circle(mouseX, mouseY, 10, fill=app.selectedTopping, opacity=50)
-
-def placeTopping(mouseX, mouseY):
-    if distance(mouseX, mouseY, app.pizzaCenter[0], app.pizzaCenter[1]) <= app.pizzaRadius:
-        app.placedToppings.append((mouseX, mouseY, app.selectedTopping))
-        app.selectedTopping = None
-
-# Cutter interaction
-def handleCutterDrag(mouseX, mouseY):
-    app.cutter.centerX, app.cutter.centerY = mouseX, mouseY
-
-def makeCut(startX, startY, endX, endY):
-    if (distance(startX, startY, app.pizzaCenter[0], app.pizzaCenter[1]) <= app.pizzaRadius or
-        distance(endX, endY, app.pizzaCenter[0], app.pizzaCenter[1]) <= app.pizzaRadius):
-        app.cuts.append(((startX, startY), (endX, endY)))
-
-# Reset cutter position
-def resetCutterPosition():
-    app.cutter.centerX, app.cutter.centerY = 375, 410
+def redrawAll(app):
+    drawPizza(app)
+    drawToppings(app)
+    drawCuts(app)
+    drawSauceBottle(app)
+    drawToppingJars(app)
+    drawCutter(app)
 
 # Event handlers
-def onMousePress(mouseX, mouseY):
-    if app.sauceBottle.hits(mouseX, mouseY):
-        app.isSauceDragging = not app.isSauceDragging
-    elif app.cutter.hits(mouseX, mouseY):
-        app.isCutterDragging = not app.isCutterDragging
-    else:
-        for topping, jar in app.toppingJars.items():
-            if jar.hits(mouseX, mouseY):
-                app.selectedTopping = topping if app.selectedTopping != topping else None
+def onMousePress(app, mouseX, mouseY):
+    # Check if the sauce bottle is clicked
+    if (app.sauceBottle['x'] - app.sauceBottle['width'] / 2 <= mouseX <= app.sauceBottle['x'] + app.sauceBottle['width'] / 2 and
+        app.sauceBottle['y'] - app.sauceBottle['height'] / 2 <= mouseY <= app.sauceBottle['y'] + app.sauceBottle['height'] / 2):
+        app.sauceBottle['dragging'] = True
+        return
 
-        if app.selectedTopping:
-            placeTopping(mouseX, mouseY)
+    # Check if any topping jar is clicked
+    for topping, jar in app.toppingJars.items():
+        if (jar['x'] - jar['width'] / 2 <= mouseX <= jar['x'] + jar['width'] / 2 and
+            jar['y'] - jar['height'] / 2 <= mouseY <= jar['y'] + jar['height'] / 2):
+            app.selectedTopping = topping
+            app.toppingDragging = True
+            return
 
-def onMouseDrag(mouseX, mouseY):
-    if app.isSauceDragging:
-        handleSauceDrag(mouseX, mouseY)
-    elif app.isCutterDragging:
-        handleCutterDrag(mouseX, mouseY)
+    # Check if the cutter is clicked
+    if (app.cutter['x'] - app.cutter['width'] / 2 <= mouseX <= app.cutter['x'] + app.cutter['width'] / 2 and
+        app.cutter['y'] - app.cutter['height'] / 2 <= mouseY <= app.cutter['y'] + app.cutter['height'] / 2):
+        app.cutter['dragging'] = True
+        return
 
-def onMouseRelease(mouseX, mouseY):
-    if app.isSauceDragging:
-        handleSauceApply(mouseX, mouseY)
-    elif app.isCutterDragging:
-        resetCutterPosition()
+def onMouseDrag(app, mouseX, mouseY):
+    # Drag sauce bottle
+    if app.sauceBottle['dragging']:
+        app.sauceBottle['x'], app.sauceBottle['y'] = mouseX, mouseY
 
-# Drawing everything
-def redrawAll():
-    drawPizza()
-    if not app.sauceApplied:
-        app.sauceOutline.draw()
-    if app.isSauceDragging:
-        handleSauceDrag(app.sauceBottle.centerX, app.sauceBottle.centerY)
-    app.sauceBottle.draw()
+    # Drag selected topping
+    elif app.toppingDragging:
+        app.lastMousePos = (mouseX, mouseY)
 
-    for jar in app.toppingJars.values():
-        jar.draw()
+    # Drag cutter
+    elif app.cutter['dragging']:
+        app.cutter['x'], app.cutter['y'] = mouseX, mouseY
 
-    drawToppings()
-    app.cutter.draw()
-    drawCuts()
+def onMouseRelease(app, mouseX, mouseY):
+    # Handle sauce application
+    if app.sauceBottle['dragging']:
+        if isInsideCircle(mouseX, mouseY, app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius - 10):
+            app.sauceApplied = True
+        resetObjectPosition(app.sauceBottle)
+        app.sauceBottle['dragging'] = False
+
+    # Handle placing a topping
+    elif app.toppingDragging and app.selectedTopping:
+        if isInsideCircle(mouseX, mouseY, app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius):
+            app.placedToppings.append({'x': mouseX, 'y': mouseY, 'color': app.toppingJars[app.selectedTopping]['color']})
+        app.selectedTopping = None
+        app.toppingDragging = False
+
+    # Handle cutter action
+    elif app.cutter['dragging']:
+        if app.lastMousePos:
+            startX, startY = app.lastMousePos
+            if isInsideCircle(startX, startY, app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius):
+                app.cuts.append(((startX, startY), (mouseX, mouseY)))
+        resetObjectPosition(app.cutter)
+        app.cutter['dragging'] = False
 
 runApp()
