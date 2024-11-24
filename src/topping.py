@@ -25,21 +25,24 @@ def onAppStart(app):
             'y': 180,
             'width': 40,
             'height': 40,
-            'color': 'brown'
+            'color': 'brown',
+            'radius': 15
         },
         'mushroom': {
             'x': 350,
             'y': 250,
             'width': 40,
             'height': 40,
-            'color': 'tan'
+            'color': 'tan',
+            'radius': 12
         },
         'olive': {
             'x': 350,
             'y': 320,
             'width': 40,
             'height': 40,
-            'color': 'black'
+            'color': 'black',
+            'radius': 10
         }
     }
     app.selectedTopping = None
@@ -66,15 +69,25 @@ def isInsideCircle(x, y, cx, cy, radius):
 
 # Drawing functions
 def drawPizza(app):
-    # Draw pizza base
-    drawCircle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius, fill='wheat', border='black')
+    # Draw crust
+    drawCircle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius, fill='goldenrod', border='saddlebrown', borderWidth=5)
+    # Draw base
+    drawCircle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius - 10, fill='wheat')
     # Draw sauce if applied
     if app.sauceApplied:
-        drawCircle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius - 10, fill='tomato', opacity=50)
+        drawCircle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius - 15, fill='tomato', opacity=80)
 
 def drawToppings(app):
     for topping in app.placedToppings:
-        drawCircle(topping['x'], topping['y'], 10, fill=topping['color'])
+        if topping['color'] == 'black':  # Olive with a hole
+            drawCircle(topping['x'], topping['y'], topping['radius'], fill=topping['color'])
+            drawCircle(topping['x'], topping['y'], topping['radius'] // 2, fill='wheat')
+        elif topping['color'] == 'tan':  # Mushroom with detail
+            drawCircle(topping['x'], topping['y'], topping['radius'], fill=topping['color'])
+            drawRect(topping['x'], topping['y'], topping['radius'], topping['radius'] // 2,
+                     fill='brown', align='center')
+        else:  # Other toppings
+            drawCircle(topping['x'], topping['y'], topping['radius'], fill=topping['color'], border='black', borderWidth=1)
 
 def drawCuts(app):
     for cut in app.cuts:
@@ -83,7 +96,9 @@ def drawCuts(app):
 def drawSauceBottle(app):
     bottle = app.sauceBottle
     drawRect(bottle['x'] - bottle['width'] / 2, bottle['y'] - bottle['height'] / 2,
-             bottle['width'], bottle['height'], fill='red', border='black')
+             bottle['width'], bottle['height'], fill='firebrick', border='black')
+    # Cap
+    drawRect(bottle['x'], bottle['y'] - bottle['height'] / 2 - 5, bottle['width'] - 20, 10, fill='gray', align='center')
 
 def drawToppingJars(app):
     for jar in app.toppingJars.values():
@@ -92,8 +107,11 @@ def drawToppingJars(app):
 
 def drawCutter(app):
     cutter = app.cutter
-    drawRect(cutter['x'] - cutter['width'] / 2, cutter['y'] - cutter['height'] / 2,
-             cutter['width'], cutter['height'], fill='gray', border='black')
+    # Draw handle
+    drawRect(cutter['x'], cutter['y'], cutter['width'], cutter['height'], fill='darkgray', align='center')
+    # Draw circular blade
+    bladeRadius = cutter['height']
+    drawCircle(cutter['x'] - cutter['width'] / 2 - bladeRadius + 5, cutter['y'], bladeRadius, fill='silver', border='black')
 
 def redrawAll(app):
     drawPizza(app)
@@ -141,7 +159,7 @@ def onMouseDrag(app, mouseX, mouseY):
 def onMouseRelease(app, mouseX, mouseY):
     # Handle sauce application
     if app.sauceBottle['dragging']:
-        if isInsideCircle(mouseX, mouseY, app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius - 10):
+        if isInsideCircle(mouseX, mouseY, app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius - 15):
             app.sauceApplied = True
         resetObjectPosition(app.sauceBottle)
         app.sauceBottle['dragging'] = False
@@ -149,7 +167,8 @@ def onMouseRelease(app, mouseX, mouseY):
     # Handle placing a topping
     elif app.toppingDragging and app.selectedTopping:
         if isInsideCircle(mouseX, mouseY, app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius):
-            app.placedToppings.append({'x': mouseX, 'y': mouseY, 'color': app.toppingJars[app.selectedTopping]['color']})
+            toppingData = app.toppingJars[app.selectedTopping]
+            app.placedToppings.append({'x': mouseX, 'y': mouseY, 'color': toppingData['color'], 'radius': toppingData['radius']})
         app.selectedTopping = None
         app.toppingDragging = False
 
@@ -157,9 +176,12 @@ def onMouseRelease(app, mouseX, mouseY):
     elif app.cutter['dragging']:
         if app.lastMousePos:
             startX, startY = app.lastMousePos
-            if isInsideCircle(startX, startY, app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius):
+            # Ensure both points of the cut are inside the pizza
+            if (isInsideCircle(startX, startY, app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius) and
+                isInsideCircle(mouseX, mouseY, app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius)):
                 app.cuts.append(((startX, startY), (mouseX, mouseY)))
         resetObjectPosition(app.cutter)
         app.cutter['dragging'] = False
+
 
 runApp()

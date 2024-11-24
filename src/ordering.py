@@ -118,7 +118,7 @@ def drawOrder(app, order, x, y):
 def randomOrder():
     doneness = random.choice(['light', 'medium', 'dark'])
     sauce = random.choice(['tomato', 'no sauce'])
-    toppings = random.sample(['mushrooms', 'pepperoni', 'cheese'], 1)
+    toppings = random.sample(['mushrooms', 'pepperoni', 'olives'], 1)
     cuts = random.choice([2, 4, 6, 8])
     return Order(doneness, sauce, toppings, cuts)
 
