@@ -9,28 +9,24 @@ def onAppStart(app):
     app.stepsPerSecond = 15
     app.showOrder = False
     app.maxCustomers = 3
-    app.redX = False  # To indicate a customer left due to low patience
     spawnCustomer(app)
 
 def redrawAll(app):
-    # Background and title
     drawRect(0, 0, 600, 500, fill='cornSilk')
     drawRect(20, 250, 500, 70, fill='saddleBrown')
     drawLabel('Papa\'s Pizzeria', app.width/2, 100, font='Times New Roman', size=20)
     
-    # Draw customers
+    #customers
     for customer in app.customers:
         drawPerson(app, customer)
     
-    # Draw orders
-    for i, order in enumerate(app.orders):
-        x = 30 + i * 120  # Non-overlapping order display
+    #orders
+    for i in range(len(app.orders)):
+        order = app.orders[i]
+        x = 30 + i * 120  
         drawOrder(app, order, x, 10)
-    
-    # Draw red X if a customer left
-    if app.redX:
-        drawLabel('X', 580, 20, size=30, fill='red', font='Times New Roman')
 
+    
 def onMousePress(app, mouseX, mouseY):
     for customer in app.customers:
         position = customer.getPos()
@@ -45,13 +41,12 @@ def onStep(app):
             customer.walk()
             customer.patience -= 1
         
-        if customer.patience <= 0:  # Customer leaves if patience runs out
+        if customer.patience <= 0:
             app.customers.remove(customer)
             app.redX = True
         else:
             app.redX = False
     
-    # Spawn new customers if fewer than 3
     if len(app.customers) < app.maxCustomers and random.random() < 0.01:
         spawnCustomer(app)
 

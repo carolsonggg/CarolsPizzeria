@@ -11,7 +11,7 @@ def onAppStart(app):
     app.timerThresholds = [60, 120, 180, 240] 
     app.timerAngles = [90, 180, 270, 360]
     app.timerSpeed = 0.5
-    app.popupVisible = False
+    app.finished = False
 
     for _ in range(5):
         app.stack.append({'state': 'uncooked', 'color': 'wheat', 'x': 540, 'y': 50 + 40 * _})
@@ -47,7 +47,7 @@ def redrawAll(app):
         drawCircle(app.draggingPizza['x'], app.draggingPizza['y'], 30, fill=app.draggingPizza['color'], border='black')
 
     #edit this as move on to next screen
-    if app.popupVisible:
+    if app.finished:
         drawRect(200, 200, 200, 100, fill='white', border='black')
         drawLabel("Next Screen", 300, 250, size=20, font='Times New Roman')
 
@@ -61,6 +61,7 @@ def drawOven(app, x, y, oven):
         drawFlames(x, y)
         drawCircle(x, y, 40, fill=oven['pizza']['color'], opacity=60)
 
+    #timers
     drawCircle(x + 70, y, 20, fill='white', border='black')
     drawLine(x + 70, y, 
              x + 70 + 15 * math.cos(math.radians(oven['angle'] - 90)),
@@ -81,9 +82,9 @@ def onStep(app):
         if oven['pizza']:
             oven['timer'] += 1
             oven['angle'] = (oven['timer'] / max(app.timerThresholds)) * 360
-            updatePizzaState(app, oven)
+            updateCrust(app, oven)
 
-def updatePizzaState(app, oven):
+def updateCrust(app, oven):
     timer = oven['timer']
     pizza = oven['pizza']
     if timer >= app.timerThresholds[3]:
