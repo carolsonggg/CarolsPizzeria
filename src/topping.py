@@ -76,6 +76,7 @@ def distance(p1, p2):
     return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
 
 def redrawAll(app):
+    drawRect(0, 0, 600, 500, fill='cornsilk')
     drawPizza(app)
     drawToppings(app)
     drawSauceBottle(app)
