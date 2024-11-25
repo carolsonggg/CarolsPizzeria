@@ -135,6 +135,6 @@ def onMouseRelease(app, mouseX, mouseY):
         i += 1
 
     if 480 <= mouseX <= 520 and 360 <= mouseY <= 420:
-        app.draggingPizza = None
+        app.draggingPizza =None
 
 runApp()
