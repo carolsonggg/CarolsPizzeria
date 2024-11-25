@@ -9,6 +9,12 @@ This project aims to recreate the gameplay mechanics of Papa’s Pizzeria, a cla
 - Increasing difficulty as players progress through levels.
 - Although the graphics will be simplified compared to the original game, the focus will be on accurately replicating the mechanics and maintaining engaging gameplay.
 
+Here are the current screens that will be implemented:
+1. Ordering. Here, the player will take the customers' orders with a time constraint. Possible penalty if a customer leaves due to no patience left over.
+2. Baking. Here, the player will bake the crust in accordance to the order, ensuring not to burn it.
+3. Topping. Here, the player will put on the sauce and toppings and make the cuts necessary, in accordance to the order.
+4. Tasting. Here, the customer will give the player a score based on how well they did with the evenness of the toppings, the cuts, and how much their patience depreciated while they were waiting for their order to be taken.
+
 Similar Projects:
 - Papa’s Pizzeria (Original Game)
     - Features: Drag-and-drop mechanics, a scoring system based on accuracy and timing, and progressively complex customer orders.
@@ -30,3 +36,7 @@ GitHub: For version control and regular backups.
 
 Backup:
 <img width="1512" alt="backup" src="https://github.com/user-attachments/assets/8eeb4716-e61c-4a25-b722-aecefce46c99">
+
+Storyboard: 
+![IMG_0383](https://github.com/user-attachments/assets/bf4c1f9f-6c71-45a7-bcaa-7225c080b4e6)
+
