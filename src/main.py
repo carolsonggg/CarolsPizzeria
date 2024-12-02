@@ -1,5 +1,5 @@
 from cmu_graphics import *
-from ordering import Person, Order, Pizza
+from objects import Person, Order, Pizza
 import random
 import math
 

@@ -1,6 +1,6 @@
-class Pizza:
+'''class Pizza:
     def __init__(self, doneness):
         self.toppingsUsed = []
         self.sauce = False
         self.doneness = doneness
-        self.cuts = 0
+        self.cuts = 0'''

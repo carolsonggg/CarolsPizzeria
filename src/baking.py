@@ -1,4 +1,4 @@
-from cmu_graphics import *
+'''from cmu_graphics import *
 import math
 import random
 from main import *
@@ -157,4 +157,4 @@ class BakingScreen:
 def onAppStart(app):
     app.timerThresholds = [60, 120, 180, 240]
     app.timerAngles = [90, 180, 270, 360]
-    app.timerSpeed = 0.5
+    app.timerSpeed = 0.5'''
