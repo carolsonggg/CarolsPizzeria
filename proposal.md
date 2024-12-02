@@ -1,5 +1,5 @@
-# Papa-s-Pizzeria
-Papa’s Pizzeria: A Digital Remake
+# CarolsPizzeria
+Carols’s Pizzeria!
 
 Description:
 This project aims to recreate the gameplay mechanics of Papa’s Pizzeria, a classic flash-based time management game. Players will operate a virtual pizza shop, managing orders, customizing pizzas with toppings, baking, and slicing pizzas according to customer preferences. The game will feature:
