@@ -222,7 +222,7 @@ def onMousePress(app, mouseX, mouseY):
             navigateToOrderingScreen(app)
             app.getScore = False
             if app.userPizzas:
-                app.userPizzas.remove(app.draggingPizza)
+                app.userPizzas.pop(0)
 
 
     elif app.currentScreen == 'ordering':
@@ -495,6 +495,8 @@ def calculateScore(app, customer):
     else:
         score += 1   
         app.userPizzas.pop(0)
+    
+    print(app.userPizzas)
     return score/5
 
 def distance(p1, p2):
