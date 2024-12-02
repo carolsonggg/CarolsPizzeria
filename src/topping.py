@@ -1,4 +1,4 @@
-from cmu_graphics import *
+'''from cmu_graphics import *
 
 def onAppStart(app):
     app.pizzaRadius = 120
@@ -146,4 +146,4 @@ def onMouseRelease(app, mouseX, mouseY):
         app.cutter['dragging'] = False
         app.lastMousePos = None
 
-runApp()
+runApp()'''
