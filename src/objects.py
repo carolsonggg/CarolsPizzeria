@@ -39,7 +39,7 @@ class Person:
         doneness = random.choice(['light', 'medium', 'dark'])
         sauce = random.choice(['tomato', 'no sauce'])
         toppings = random.sample(['mushrooms', 'pepperoni', 'olives'], 1)
-        cuts = random.choice([1,2,3,4,5,6])
+        cuts = random.choice([1,2,3,4])
         return Order(doneness, sauce, toppings, cuts)
 
 class Order:

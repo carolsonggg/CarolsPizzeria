@@ -7,14 +7,16 @@ track = Sound('https://s3.amazonaws.com/cmu-cs-academy.lib.prod/sounds/Drum1.mp3
 track.play(loop = True)
 
 def onAppStart(app):
+    resetGame(app)
+def resetGame(app):
     #orderign
     app.currentScreen = 'ordering'  
-    app.customers = spawnCustomer()
+    app.customers = []
     app.orders = []
     app.level = 1
     app.ordersTaken = 0
     app.showOrder = False
-    app.maxCustomers = 3
+    app.maxCustomers = 1
     app.userPizzas = []
     app.stepsPerSecond = 15
 
@@ -57,12 +59,12 @@ def onAppStart(app):
     app.totalEarnings = 0
     app.getScore = False
     app.currentCustomer = None
+    app.noScore = False
 
-def spawnCustomer():
+def spawnCustomer(app):
     newCustomer = randomPerson()
-    f = []
-    f.append(newCustomer)
-    return f
+    app.customers.append(newCustomer)
+    return app.customers
 
 def randomPerson():
     hairColors = ['black', 'brown', 'goldenrod', 'red']
@@ -98,7 +100,7 @@ def redrawAll(app):
 
     elif app.currentScreen == 'judging':
         drawRect(0, 0, 600, 500, fill='cornsilk')
-        drawRect(20, 250, 500, 70, fill='saddleBrown')
+        drawRect(20, 250, 550, 70, fill='saddleBrown')
         drawLabel('Carol\'s Pizzeria', app.width/2, 100, font='Times New Roman', size=20)
         
         for customer in app.customers:
@@ -107,14 +109,16 @@ def redrawAll(app):
         drawRect(500, 450, 80, 40, fill='red')
         drawLabel('Continue', 540, 470, size=16, font= 'Times New Roman')
         
-        if app.getScore:
+        if app.noScore:
+            drawNoScore()
+        elif app.getScore:
             drawScore(app, app.customers[0])
         
-        drawLabel(f'Total Earnings: {app.totalEarnings}', 500, 50, font = 'Times New Roman')
+       #drawLabel(f'Total Earnings: {app.totalEarnings}', 500, 50, font = 'Times New Roman')
 
     elif app.currentScreen == 'ordering':
         drawRect(0, 0, 600, 500, fill='cornSilk')
-        drawRect(20, 250, 500, 70, fill='saddleBrown')
+        drawRect(20, 250, 550, 70, fill='saddleBrown')
         drawLabel('Carol\'s Pizzeria', app.width/2, 100, font='Times New Roman', size=20)
     
         for customer in app.customers:
@@ -122,9 +126,6 @@ def redrawAll(app):
     
         drawRect(500, 450, 80, 40, fill='red')
         drawLabel('Next', 540, 470, size=16, font= 'Times New Roman')
-
-        drawRect(100, 450, 80, 40, fill='red')
-        drawLabel('Back', 140, 470, size=16, font= 'Times New Roman')
     
     elif app.currentScreen == 'baking':
         drawRect(0, 0, 600, 500, fill='cornsilk')
@@ -211,18 +212,24 @@ def onMousePress(app, mouseX, mouseY):
 
     elif app.currentScreen == 'judging':
         for customer in app.customers:
+            position = customer.getPos()
             if customer.standingStill == True:
-                position = customer.getPos()
+                
                 if position - 20 <= mouseX <= position + 20 and 145 <= mouseY <= 190:
                     app.currentCustomer = customer
                     app.getScore = True
+            
+            if position - 20 <= mouseX <= position + 20 and 145 <= mouseY <= 190:
+                app.noScore = True
+                app.getScore = True
                     
         
         if 500 <= mouseX <= 580 and 450 <= mouseY <= 490:
-            navigateToOrderingScreen(app)
-            app.getScore = False
+            resetGame(app)
+            return
+            '''app.getScore = False
             if app.userPizzas:
-                app.userPizzas.pop(0)
+                app.userPizzas.pop(0)'''
 
 
     elif app.currentScreen == 'ordering':
@@ -354,8 +361,8 @@ def onStep(app):
             if customer.patience <= 0:
                 app.customers.remove(customer)
     
-        if len(app.customers) < app.maxCustomers and random.random() < 0.01:
-            app.customers = spawnCustomer()
+        if len(app.customers) < app.maxCustomers and random.random() < 0.25:
+            app.customers = spawnCustomer(app)
 
     elif app.currentScreen == 'baking':
         for oven in app.ovens:
@@ -454,10 +461,14 @@ def drawCutter(app):
     bladeRadius = cutter['height']
     drawCircle(cutter['x'] - cutter['width'] / 2 - bladeRadius + 5, cutter['y'], bladeRadius, fill='silver', border='black')
 
+def drawNoScore():
+    drawRect(100,100,300,200,fill='white')
+    drawLabel('0/5', 250, 150, font='Times New Roman', size = 30)
+
 def drawScore(app, customer):
     score = calculateScore(app, customer)
-    drawRect(100,100,300,500,fill='white')
-    drawLabel(f'score: {score}/5', 250, 350, font='Times New Roman', size = 30)
+    drawRect(100,100,300,200,fill='white')
+    drawLabel(f'score: {score}/5', 250, 150, font='Times New Roman', size = 30)
 
 def calculateScore(app, customer):
     score = 0
@@ -493,10 +504,7 @@ def calculateScore(app, customer):
     elif abs(customer.order.cuts - app.userPizzas[0].cuts) <= 2:
         score += 3
     else:
-        score += 1   
-        app.userPizzas.pop(0)
-    
-    print(app.userPizzas)
+        score += 1
     return score/5
 
 def distance(p1, p2):
