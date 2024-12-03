@@ -42,3 +42,13 @@ Storyboard:
 
 Citations:
 - music: https://s3.amazonaws.com/cmu-cs-academy.lib.prod/sounds/Drum1.mp3
+- images:
+  - https://www.coolmathgames.com/sites/default/files/PapasPizzeria_OG-logo.jpg
+  - https://www.flipline.com/blog/wp-content/uploads/2019/08/blog_pizzalobby.jpg
+  - https://static.wikia.nocookie.net/fliplinestudios/images/f/f0/Papa%27s_Pizzeria_-_Bake_Station.png/revision/latest?cb=20131111024047
+  - https://www.flipline.com/blog/wp-content/uploads/2017/06/build_04.jpg
+  - https://png.pngtree.com/png-vector/20220705/ourmid/pngtree-mushroom-slices-on-white-background-art-food-picture-vector-png-image_37059976.png
+  - https://cdn.creazilla.com/cliparts/6130813/pizza-cutter-clipart-lg.png
+  - https://png.pngtree.com/png-clipart/20230218/ourmid/pngtree-beef-pepperoni-png-image_6605978.png
+  - https://goldenpizzalincoln.com/wp-content/plugins/pizzatime/images/salsa-sauce.png
+  - https://content.mycutegraphics.com/graphics/food/black-olive-slice.png
