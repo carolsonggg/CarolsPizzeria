@@ -218,6 +218,7 @@ def onMousePress(app, mouseX, mouseY):
                 if position - 20 <= mouseX <= position + 20 and 145 <= mouseY <= 190:
                     app.currentCustomer = customer
                     app.getScore = True
+                    return
             
             if position - 20 <= mouseX <= position + 20 and 145 <= mouseY <= 190:
                 app.noScore = True
@@ -529,6 +530,6 @@ def navigateToJudgingScreen(app):
 
 
 def main():
-    runApp()
+    runApp(width= 600, height=500)
 
 main()
