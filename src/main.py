@@ -10,7 +10,7 @@ def onAppStart(app):
     resetGame(app)
 def resetGame(app):
     #orderign
-    app.currentScreen = 'ordering'  
+    app.currentScreen = 'start'  
     app.customers = []
     app.orders = []
     app.level = 1
@@ -78,11 +78,12 @@ def randomOrder():
     doneness = random.choice(['light', 'medium', 'dark'])
     sauce = random.choice(['tomato', 'no sauce'])
     toppings = random.sample(['mushrooms', 'pepperoni', 'olives'], 1)
-    cuts = random.choice([2, 4, 6, 8])
+    cuts = random.choice([1,2,3,4,5])
     return Order(doneness, sauce, toppings, cuts)
 
 def redrawAll(app):
-    
+    if app.currentScreen == 'start':
+        Image(link, 0, 0)
     if app.currentScreen == 'topping':
         drawRect(0, 0, 600, 500, fill='cornsilk')
         drawPizza(app)
@@ -254,7 +255,6 @@ def onMousePress(app, mouseX, mouseY):
         #for pizza in reversed(app.stack):
         if abs(mouseX - 540) < 30 and abs(mouseY - 130) < 200:
             app.draggingPizza = Pizza()
-            print('hi')
             app.userPizzas.append(app.draggingPizza)
             return
         for oven in app.ovens:
@@ -506,7 +506,7 @@ def calculateScore(app, customer):
         score += 3
     else:
         score += 1
-    return score/5
+    return score/4
 
 def distance(p1, p2):
     x1, y1 = p1
