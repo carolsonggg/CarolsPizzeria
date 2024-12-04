@@ -8,22 +8,29 @@ class Person:
         self.skin = skin
         self.shirt = shirt
         self.order = order
-        self.x = random.randint(50, 350)
+        self.x = random.randint(200, 500)
+        self.y = random.randint(280, 420)
         self.patience = random.randint(500, 1000)
         self.initialPatience = self.patience
         self.standingStill = False
         self.score = 100
         
     def walk(self):
-        if self.x < 100:
+        if self.x < 220:
             self.x += 10
-        elif self.x > 400:
+        elif self.x > 500:
             self.x -= 10
         else:
             self.x += random.randint(-25, 25)
+        if self.y < 280:
+            self.y += 10
+        elif self.y > 420:
+            self.y -= 10
+        else:
+            self.y += random.randint(-25, 25)
         
     def getPos(self):
-        return self.x
+        return (self.x, self.y)
     
     def getOrder(self):
         return self.order
