@@ -41,8 +41,14 @@ Storyboard:
 ![IMG_0383](https://github.com/user-attachments/assets/bf4c1f9f-6c71-45a7-bcaa-7225c080b4e6)
 
 Citations:
-- music: [https://s3.amazonaws.com/cmu-cs-academy.lib.prod/sounds/Drum1.mp3](https://incompetech.com/music/royalty-free/music.html
-https://incompetech.com/music/royalty-free/mp3-royaltyfree/Sergio%2527s%20Magic%20Dustbin.mp3)
+- music/sounds:
+    - "Sergio's Magic Dustbin " Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+    - Vibing Over Venus" Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons: By Attribution 4.0 License
+http://creativecommons.org/licenses/by/4.0/
+    - https://mixkit.co/free-sound-effects/click/
 - images:
   - https://www.coolmathgames.com/sites/default/files/PapasPizzeria_OG-logo.jpg
   - https://www.flipline.com/blog/wp-content/uploads/2019/08/blog_pizzalobby.jpg
