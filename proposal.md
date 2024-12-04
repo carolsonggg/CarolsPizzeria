@@ -53,3 +53,4 @@ Citations:
   - https://goldenpizzalincoln.com/wp-content/plugins/pizzatime/images/salsa-sauce.png
   - https://content.mycutegraphics.com/graphics/food/black-olive-slice.png
   - https://cdn.icon-icons.com/icons2/2987/PNG/512/home_set_of_house_clipart_icon_187233.png
+  - https://png.pngtree.com/png-vector/20220607/ourmid/pngtree-tomato-ketchup-bottle-icon-png-image_4855499.png
