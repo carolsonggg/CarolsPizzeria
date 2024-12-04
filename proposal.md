@@ -52,3 +52,4 @@ Citations:
   - https://png.pngtree.com/png-clipart/20230218/ourmid/pngtree-beef-pepperoni-png-image_6605978.png
   - https://goldenpizzalincoln.com/wp-content/plugins/pizzatime/images/salsa-sauce.png
   - https://content.mycutegraphics.com/graphics/food/black-olive-slice.png
+  - https://cdn.icon-icons.com/icons2/2987/PNG/512/home_set_of_house_clipart_icon_187233.png
