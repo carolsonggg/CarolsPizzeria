@@ -2,18 +2,18 @@ from cmu_graphics import *
 import random
 
 class Person:
-    def __init__(self, hair, hairStyle, skin, shirt, order):
+    def __init__(self, hair, hairStyle, skin, shirt, order, x, y):
         self.hair = hair
         self.hairStyle = hairStyle
         self.skin = skin
         self.shirt = shirt
         self.order = order
-        self.x = random.randint(200, 500)
-        self.y = random.randint(280, 420)
+        self.x = x
+        self.y = y
         self.patience = random.randint(500, 1000)
         self.initialPatience = self.patience
         self.standingStill = False
-        self.score = 100
+        self.mood = 'nothing'
         
     def walk(self):
         if self.x < 220:

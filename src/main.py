@@ -3,13 +3,13 @@ from objects import Person, Order, Pizza
 import random
 import math
 
-track = Sound('https://s3.amazonaws.com/cmu-cs-academy.lib.prod/sounds/Drum1.mp3') #change
-track.play(loop = True)
-
 def onAppStart(app):
+    app.track1 = Sound('start.mp3') 
+    app.track1.play(loop = True)
     resetGame(app)
 def resetGame(app):
     #orderign
+    app.track2 = Sound('gameMusic.mp3')
     app.currentScreen = 'start'  
     app.customers = []
     app.orders = []
@@ -21,6 +21,7 @@ def resetGame(app):
     app.stepsPerSecond = 15
 
     #baking
+    app.currentPizza = Pizza()
     app.timerThresholds = [60, 120, 180, 240]
     app.timerAngles = [90, 180, 270, 360]
     app.timerSpeed = 0.5
@@ -57,7 +58,11 @@ def resetGame(app):
 
 
     #judging
-    app.totalEarnings = 0
+    app.getScore = False
+    app.currentCustomer = None
+    app.noScore = False
+
+def resetJudging(app):
     app.getScore = False
     app.currentCustomer = None
     app.noScore = False
@@ -68,12 +73,12 @@ def spawnCustomer(app):
     return app.customers
 
 def randomPerson():
-    hairColors = ['black', 'brown', 'goldenrod', 'red']
-    hairStyles = [[80,90], [80, 110]]
+    hairColors = ['black', 'brown', 'goldenrod', 'red', 'sienna', 'maroon', 'peru', 'gray', 'khaki', 'lightPink','lightSeaGreen', 'lightBlue'] #includes hijabs
+    hairStyles = [[80,75], [80, 110]]
     skinColors = ['tan', 'bisque', 'saddleBrown', 'burlyWood']
     shirtColors = ['blue','pink','green','orange','lightBlue', 'maroon']
     order = randomOrder()
-    return Person(random.choice(hairColors), random.choice(hairStyles), random.choice(skinColors), random.choice(shirtColors), order)
+    return Person(random.choice(hairColors), random.choice(hairStyles), random.choice(skinColors), random.choice(shirtColors), order, random.randint(200, 500), random.randint(280, 420))
 
 def randomOrder():
     doneness = random.choice(['light', 'medium', 'dark'])
@@ -88,7 +93,8 @@ def redrawAll(app):
     if app.currentScreen == 'instructions':
         drawLabel('instructions coming soon', 300,250)
     if app.currentScreen == 'credits':
-        drawLabel('credits coming soon',300,250)
+        drawImage('credits.jpg', 0, 0, width=600, height=500)
+
     if app.currentScreen == 'topping':
         drawImage('toppingBackground.jpg', 0, 0, width=600, height=500)
 
@@ -110,20 +116,21 @@ def redrawAll(app):
             drawOrder(order, 476, 110)
 
     elif app.currentScreen == 'judging':
-        drawRect(0, 0, 600, 500, fill='cornsilk')
-        drawRect(20, 250, 550, 70, fill='saddleBrown')
+        drawImage('judging.jpg', 0, 0, width=600, height=500)
         #drawLabel('Carol\'s Pizzeria', app.width/2, 100, font='Times New Roman', size=20)
         
         for customer in app.customers:
-            drawPerson(customer)
-        
-        drawRect(500, 450, 80, 40, fill='red')
-        drawLabel('Continue', 540, 470, size=16, font= 'Times New Roman')
-        
-        if app.noScore:
-            drawNoScore()
-        elif app.getScore:
-            drawScore(app, app.customers[0])
+            drawPersonWPos(customer)
+
+                
+            if app.getScore:
+                drawScore(app, customer)
+                if customer.mood == 'happy':
+                    drawImage('happy.png', 400, 260, width=30, height=10)
+                elif customer.mood == 'sad':
+                    drawImage('sad.png', 400, 260, width=30, height=10)
+                elif customer.mood == 'meh':
+                    drawLine(410, 260, 420, 260)
         
        #drawLabel(f'Total Earnings: {app.totalEarnings}', 500, 50, font = 'Times New Roman')
 
@@ -182,6 +189,13 @@ def redrawAll(app):
             order = app.orders[i]
             drawOrder(order, 458, 150)
 
+def drawPersonWPos(person):
+    drawOval(415, 280-30, person.hairStyle[0], person.hairStyle[1], fill=person.hair, border = 'saddlebrown')
+    drawOval(415, 280 + 10,60, 120, fill=person.shirt, border = 'saddlebrown')
+    drawCircle(415, 280-30, 30, fill=person.skin, border = 'saddlebrown')
+    drawOval(415 + 5, 280-30, 6, 10)
+    drawOval(415 - 5, 280-30, 6, 10)
+    
 def drawPerson(person):
         if person.patience > 0:
             drawOval(person.x, person.y-30, person.hairStyle[0], person.hairStyle[1], fill=person.hair, border = 'saddlebrown')
@@ -206,15 +220,26 @@ def onMousePress(app, mouseX, mouseY):
     if app.currentScreen == 'start':
         if 240 <= mouseX <= 360 and 335 <= mouseY <= 365:
             app.currentScreen = 'ordering'
+            Sound('click.wav').play() 
+            app.track1.pause()
+            app.track2.play(loop = True)
         if 240 <= mouseX <= 360 and 380 <= mouseY <= 410:
             app.currentScreen = 'instructions'
+            Sound('click.wav').play() 
         if 240 <= mouseX <= 360 and 425 <= mouseY <= 455:
             app.currentScreen = 'credits'
+            Sound('click.wav').play() 
+    
+    if app.currentScreen == 'credits':
+        if 0 <= mouseX <= 120 and 0 <= mouseY <= 50:
+            Sound('click.wav').play() 
+            app.currentScreen = 'start'
 
     if app.currentScreen == 'topping':
         if (app.sauceBottle['x'] - app.sauceBottle['width'] / 2 <= mouseX <= app.sauceBottle['x'] + app.sauceBottle['width'] / 2 and
             app.sauceBottle['y'] - app.sauceBottle['height'] / 2 <= mouseY <= app.sauceBottle['y'] + app.sauceBottle['height'] / 2):
             app.sauceBottle['dragging'] = True
+            Sound('click.wav').play() 
             
         for topping, jar in app.toppingJars.items():
             if (jar['x'] - jar['width'] / 2 <= mouseX <= jar['x'] + jar['width'] / 2 and
@@ -223,6 +248,7 @@ def onMousePress(app, mouseX, mouseY):
                 app.toppingDragging = True
                 if app.userPizzas:
                     app.userPizzas[0].topping = topping
+                Sound('click.wav').play() 
                 
 
         cutter = app.cutter
@@ -231,32 +257,46 @@ def onMousePress(app, mouseX, mouseY):
             app.cutter['dragging'] = True
             app.lastMousePos = (mouseX, mouseY)
             app.lastCutPoint = None 
+            Sound('click.wav').play() 
             
         if 490 <= mouseX <= 580 and 380 <= mouseY <= 420:
             app.currentScreen = 'judging'
+            Sound('click.wav').play() 
         if 0 <= mouseX <= 100 and 0 <= mouseY <= 50:
             navigateToBakingScreen(app)
+            Sound('click.wav').play() 
         
         if 550 <= mouseX <= 575 and 8 <= mouseY <= 65:
+            Sound('click.wav').play()
+            app.track2.pause() 
+            app.track1.play(loop = True)
             resetGame(app)
+            
 
     elif app.currentScreen == 'judging':
         for customer in app.customers:
-            personX, personY = customer.getPos()
-            if customer.standingStill == True:
-                
-                if personX - 40 <= mouseX <= personX + 40 and personY-70 <= mouseY <= personY+10:
-                    app.currentCustomer = customer
-                    app.getScore = True
-                    return
-            
-            if personX - 40 <= mouseX <= personY + 40 and personY-70 <= mouseY <= personY+10:
-                app.noScore = True
+            if 415 - 40 <= mouseX <= 415 + 40 and 280-70 <= mouseY <= 280+10:
+                app.currentCustomer = customer
                 app.getScore = True
+                Sound('click.wav').play() 
+                return
+            
+            else: 
+                app.noScore = True
+                Sound('click.wav').play()
                     
         
-        if 500 <= mouseX <= 580 and 450 <= mouseY <= 490:
-            resetGame(app)
+        if 450 <= mouseX <= 600 and 0 <= mouseY <= 60:
+            app.currentScreen = 'ordering'
+            if app.customers:
+                app.customers.pop()
+            if app.orders:
+                app.orders.pop()
+            app.placedToppings = []
+            app.cuts = []
+            app.sauceApplied = False
+            resetJudging(app)
+            Sound('click.wav').play() 
             return
             '''app.getScore = False
             if app.userPizzas:
@@ -267,50 +307,68 @@ def onMousePress(app, mouseX, mouseY):
         for customer in app.customers:
             personX, personY = customer.getPos()
             if personX - 40 <= mouseX <= personX + 40 and personY-70 <= mouseY <= personY+10:
-                if customer not in app.orders and len(app.orders) < app.maxCustomers:
+                if len(app.orders) < app.maxCustomers:
                     app.orders.append(customer.getOrder())
                     customer.standingStill = True
+                    Sound('click.wav').play() 
         
             if customer.standingStill:
                 if 40 <= mouseX <= 160 and 50 <= mouseY <= 190:
                         navigateToBakingScreen(app)
+                        Sound('click.wav').play() 
                         return
 
         if 480 <= mouseX <= 600 and 460 <= mouseY <= 500:
             navigateToBakingScreen(app)
+            Sound('click.wav').play() 
         
         if 545 <= mouseX <= 570 and 10 <= mouseY <= 70:
+            Sound('click.wav').play()
+            app.track2.pause()
+            app.track1.play(loop = True)
             resetGame(app)
+             
 
     elif app.currentScreen == 'baking':
         #for pizza in reversed(app.stack):
         if abs(mouseX) < 30 and abs(mouseY) < 200:
             app.draggingPizza = Pizza()
             app.userPizzas.append(app.draggingPizza)
+            Sound('click.wav').play() 
             return
         for oven in app.ovens:
             if oven['pizza']:
                 app.draggingPizza = oven['pizza']
                 oven['pizza'] = None
+                Sound('click.wav').play() 
                 return
 
         for i in range(len(app.orders)):
             x = 30 + i * 120
             if x <= mouseX <= x + 80 and 10 <= mouseY <= 70:
                 app.currentOrder = app.orders.pop(i)
+                Sound('click.wav').play() 
                 return
 
         if app.currentOrder and 20 <= mouseX <= 220 and 200 <= mouseY <= 300:
             app.orders.insert(0, app.currentOrder)
             app.currentOrder = None
+            Sound('click.wav').play() 
 
         if 450 <= mouseX<= 580 and 410 <= mouseY <= 445:
-            resetGame(app)  
+            Sound('click.wav').play() 
+            app.track2.pause()
+            app.track1.play(loop = True)
+            resetGame(app)
+
+              
 
 
         if 475 <= mouseX <= 600 and 460 <= mouseY <= 500:
+            Sound('click.wav').play() 
             navigateToToppingScreen(app)
         if 0 <= mouseX <= 100 and 455 <= mouseY <= 500:
+            Sound('click.wav').play() 
             navigateToOrderingScreen(app)
     
 
@@ -386,7 +444,7 @@ def onMouseRelease(app, mouseX, mouseY):
             return
         
         if 90 <= mouseX <= 220 and 0 <= mouseY <= 110:
-            app.draggingPizza = None
+            app.currentPizza = app.draggingPizza
             app.currentScreen = 'topping'
             return
         app.draggingPizza = None
@@ -476,7 +534,7 @@ def isInsideCircle(x, y, cx, cy, radius):
 
 def drawPizza(app):
     if app.orders:
-        drawCircle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius - 10, fill=app.pizzaColors[app.orders[0].doneness])
+        drawCircle(app.pizzaCenter[0], app.pizzaCenter[1], app.pizzaRadius - 10, fill=app.pizzaColors[app.currentPizza.doneness])
     if app.sauceApplied:
         drawImage('sauce.png', 141, 155, width = 330, height = 330)
 
@@ -519,13 +577,51 @@ def drawCutter(app):
     drawCircle(cutter['x'] - cutter['width'] / 2 - bladeRadius + 5, cutter['y'], bladeRadius, fill='silver', border='black')'''
 
 def drawNoScore():
-    drawRect(100,100,300,200,fill='white')
-    drawLabel('0/5', 250, 150, font='Times New Roman', size = 30)
+    drawStar(300-180, 130, 40, 5, fill='whiteSmoke')
+    drawStar(300-90, 130, 40, 5, fill='whiteSmoke')
+    drawStar(300, 130, 40, 5, fill='whiteSmoke')
+    drawStar(300+90, 130, 40, 5, fill='whiteSmoke')
+    drawStar(300+180, 130, 40, 5, fill='whiteSmoke')
 
 def drawScore(app, customer):
     score = calculateScore(app, customer)
-    drawRect(100,100,300,200,fill='white')
-    drawLabel(f'score: {score}/5', 250, 150, font='Times New Roman', size = 30)
+    if score >= 4.1:
+        drawStar(300-180, 130, 40, 5, fill='gold')
+        drawStar(300-90, 130, 40, 5, fill='gold')
+        drawStar(300, 130, 40, 5, fill='gold')
+        drawStar(300+90, 130, 40, 5, fill='gold')
+        drawStar(300+180, 130, 40, 5, fill='gold')
+    elif 4.1 > score >= 3.1:
+        drawStar(300-180, 130, 40, 5, fill='gold')
+        drawStar(300-90, 130, 40, 5, fill='gold')
+        drawStar(300, 130, 40, 5, fill='gold')
+        drawStar(300+90, 130, 40, 5, fill='gold')
+        drawStar(300+180, 130, 40, 5, fill='whiteSmoke')
+    elif 3.1 > score >= 2.1:
+        drawStar(300-180, 130, 40, 5, fill='gold')
+        drawStar(300-90, 130, 40, 5, fill='gold')
+        drawStar(300, 130, 40, 5, fill='gold')
+        drawStar(300+90, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300+180, 130, 40, 5, fill='whiteSmoke')
+    elif 2.1 > score >= 1.1:
+        drawStar(300-180, 130, 40, 5, fill='gold')
+        drawStar(300-90, 130, 40, 5, fill='gold')
+        drawStar(300, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300+90, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300+180, 130, 40, 5, fill='whiteSmoke')
+    elif 1.1 > score >= 0.1:
+        drawStar(300-180, 130, 40, 5, fill='gold')
+        drawStar(300-90, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300+90, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300+180, 130, 40, 5, fill='whiteSmoke')
+    else:
+        drawStar(300-180, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300-90, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300+90, 130, 40, 5, fill='whiteSmoke')
+        drawStar(300+180, 130, 40, 5, fill='whiteSmoke')
+
 
 def calculateScore(app, customer):
     score = 0
@@ -540,29 +636,37 @@ def calculateScore(app, customer):
         score += 2
     elif patienceUsed < 750:
         score += 1
-        
-    if customer.order.doneness == app.userPizzas[0].doneness:
-        score += 5
-    else:
-        score += 2
+    if app.userPizzas:    
+        if customer.order.doneness == app.userPizzas[0].doneness:
+            score += 5
+        else:
+            score += 2
+    if app.userPizzas:
+        if customer.order.toppings == app.userPizzas[0].toppings:
+            score += 5
+        else:
+            score += 3
     
-    if customer.order.toppings == app.userPizzas[0].toppings:
-        score += 5
+    if app.userPizzas:
+        if customer.order.sauce == app.userPizzas[0].sauce:
+            score += 5
+        else:
+            score += 0
+    if app.userPizzas:
+        if customer.order.cuts == app.userPizzas[0].cuts:
+            score += 5
+        elif abs(customer.order.cuts - app.userPizzas[0].cuts) <= 2:
+            score += 3
+        else:
+            score += 1
+    score/= 4
+    if score >= 4:
+        customer.mood = 'happy'
+    elif score <=2:
+        customer.mood = 'sad'
     else:
-        score += 3
-    
-    if customer.order.sauce == app.userPizzas[0].sauce:
-        score += 5
-    else:
-        score += 0
-    
-    if customer.order.cuts == app.userPizzas[0].cuts:
-        score += 5
-    elif abs(customer.order.cuts - app.userPizzas[0].cuts) <= 2:
-        score += 3
-    else:
-        score += 1
-    return score/4
+        customer.mood = 'meh'
+    return score
 
 def distance(p1, p2):
     x1, y1 = p1
