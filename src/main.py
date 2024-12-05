@@ -544,11 +544,6 @@ def onStep(app):
                 oven['timer'] += 1
                 oven['angle'] = (oven['timer'] / max(app.timerThresholds)) * 360
                 updateCrust(app, oven)
-        if app.currentScreen == 'instructions3':
-            for oven in app.ovens:
-                if oven['pizza'] and oven['pizza'].doneness == 'medium':
-                    app.currentScreen == 'instructions4'
-
 
 '''def generateNewCrusts(app):
         f = []
