@@ -8,6 +8,9 @@ def onAppStart(app):
     app.track1.play(loop = True)
     resetGame(app)
 def resetGame(app):
+    app.demoCustomer = randomPerson()
+    app.guide = False
+
     #orderign
     app.track2 = Sound('gameMusic.mp3')
     app.currentScreen = 'start'  
@@ -27,7 +30,7 @@ def resetGame(app):
     app.timerSpeed = 0.5
     #app.stack = generateNewCrusts(app)
     app.readyPlate = []
-    app.ovens = [{'pizza': None, 'timer': 0, 'angle': 0} for _ in range(4)]
+    app.ovens = [{'pizza': None, 'timer': 0, 'angle': 0, 'x': 140, 'y': 215}, {'pizza': None, 'timer': 0, 'angle': 0, 'x': 140+160, 'y': 215}, {'pizza': None, 'timer': 0, 'angle': 0, 'x': 140, 'y': 215 + 180 }, {'pizza': None, 'timer': 0, 'angle': 0, 'x': 140 +160, 'y': 215 + 180}]
     app.draggingPizza = None
     app.currentOrder = None
     app.pizzaColors = {'burnt':'black','dark':'saddleBrown','medium':'peru','light':'tan'}
@@ -90,8 +93,35 @@ def randomOrder():
 def redrawAll(app):
     if app.currentScreen == 'start':
         drawImage('start.jpg', 0, 0, width=600, height=500)
-    if app.currentScreen == 'instructions':
-        drawLabel('instructions coming soon', 300,250)
+    
+    if app.currentScreen == 'instructions1':
+        drawImage('instructions1.jpg', 0, 0, width=600, height=500)
+        drawPersonWPos(app.demoCustomer)
+    
+    if app.currentScreen == 'instructions2':
+        drawImage('instructions2.jpg', 0, 0, width=600, height=500)
+        drawPersonWPos(app.demoCustomer)
+        drawOrder(Order('medium', 'tomato', ['mushrooms'], 2), 40, 50)
+
+    if app.currentScreen == 'instructions3':
+        drawImage('instructions3.jpg', 0, 0, width=600, height=500)
+        drawOrder(Order('medium', 'tomato', ['mushrooms'], 2), 458, 150)
+        drawCrustStack(app)
+        if app.draggingPizza:
+            drawCircle(app.draggingPizza.x, app.draggingPizza.y, 30, fill=app.draggingPizza.color, border='black')
+        for i in range(2):
+            for j in range(2):
+                x = 140 + j * 160
+                y = 215 + i * 180
+                drawOven(app, x, y, app.ovens[i * 2 + j])
+                drawTimers(app, x, y, app.ovens[i * 2 + j])
+        
+        if app.guide:
+            drawImage('guide.jpg', 75,50,width=400, height=400, borderWidth=30)
+
+    if app.currentScreen == 'instructions4':
+        drawImage('instructions4.jpg', 0, 0, width=600, height=500)
+    
     if app.currentScreen == 'credits':
         drawImage('credits.jpg', 0, 0, width=600, height=500)
 
@@ -157,7 +187,8 @@ def redrawAll(app):
                 drawTimers(app, x, y, app.ovens[i * 2 + j])
             
         #drawCircle(100, 370, 40, fill='gold', border='black')
-        for i, pizza in zip(range(len(app.readyPlate)), app.readyPlate):
+        for i in range(len(app.readyPlate)):
+            pizza = app.readyPlate[i]
             drawCircle(100 + i * 30, 370, 20, fill=pizza.color)
         '''drawLabel('Trash Can', 450, 330, size=14, font='Times New Roman')
         drawRect(430, 360, 40, 60, fill='gray', border='black', borderWidth=2)
@@ -224,12 +255,54 @@ def onMousePress(app, mouseX, mouseY):
             app.track1.pause()
             app.track2.play(loop = True)
         if 240 <= mouseX <= 360 and 380 <= mouseY <= 410:
-            app.currentScreen = 'instructions'
+            app.currentScreen = 'instructions1'
             Sound('click.wav').play() 
         if 240 <= mouseX <= 360 and 425 <= mouseY <= 455:
             app.currentScreen = 'credits'
             Sound('click.wav').play() 
     
+    if app.currentScreen == 'instructions1':
+        if 415 - 40 <= mouseX <= 415 + 40 and 280-70 <= mouseY <= 280+10:    
+            Sound('click.wav').play() 
+            app.currentScreen = 'instructions2'
+        if 545 <= mouseX <= 570 and 10 <= mouseY <= 70:
+            Sound('click.wav').play()
+            resetGame(app)
+    
+    if app.currentScreen == 'instructions2':
+        if 40 <= mouseX <= 160 and 50 <= mouseY <= 190:
+            app.currentScreen = 'instructions3'
+            Sound('click.wav').play()             
+        if 480 <= mouseX <= 600 and 460 <= mouseY <= 500:
+            app.currentScreen = 'instructions3'
+            Sound('click.wav').play() 
+        if 545 <= mouseX <= 570 and 10 <= mouseY <= 70:
+            Sound('click.wav').play()
+            resetGame(app)
+    
+    if app.currentScreen == 'instructions3':
+        if abs(mouseX) < 40 and abs(mouseY) < 200:
+            app.draggingPizza = Pizza()
+            Sound('click.wav').play() 
+            return
+        for oven in app.ovens:
+            if oven['pizza']:
+                if abs(mouseX - oven['x']) < 50 and abs(mouseY-oven['y']) < 50:
+                    app.draggingPizza = oven['pizza']
+                    oven['pizza'] = None
+                    Sound('click.wav').play() 
+                    return
+                
+        if 450 <= mouseX<= 580 and 410 <= mouseY <= 445:
+            Sound('click.wav').play() 
+            resetGame(app)
+        
+        if 50 <= mouseX <= 120 and 450 <= mouseY <= 480:
+            Sound('click.wav').play() 
+            app.guide = True
+        else:
+            app.guide = False
+                
     if app.currentScreen == 'credits':
         if 0 <= mouseX <= 120 and 0 <= mouseY <= 50:
             Sound('click.wav').play() 
@@ -338,10 +411,11 @@ def onMousePress(app, mouseX, mouseY):
             return
         for oven in app.ovens:
             if oven['pizza']:
-                app.draggingPizza = oven['pizza']
-                oven['pizza'] = None
-                Sound('click.wav').play() 
-                return
+                if abs(mouseX - oven['x']) < 50 and abs(mouseY-oven['y']) < 50:
+                    app.draggingPizza = oven['pizza']
+                    oven['pizza'] = None
+                    Sound('click.wav').play() 
+                    return
 
         for i in range(len(app.orders)):
             x = 30 + i * 120
@@ -360,9 +434,6 @@ def onMousePress(app, mouseX, mouseY):
             app.track2.pause()
             app.track1.play(loop = True)
             resetGame(app)
-
-              
-
 
         if 475 <= mouseX <= 600 and 460 <= mouseY <= 500:
             Sound('click.wav').play() 
@@ -396,7 +467,7 @@ def onMouseDrag(app, mouseX, mouseY):
             else:
                 app.lastCutPoint = None
 
-    if app.currentScreen == 'baking':
+    if app.currentScreen == 'baking' or app.currentScreen == 'instructions3':
         if app.draggingPizza:
             app.draggingPizza.x, app.draggingPizza.y = mouseX, mouseY
 
@@ -425,7 +496,7 @@ def onMouseRelease(app, mouseX, mouseY):
             app.cutter['dragging'] = False
             app.lastMousePos = None
 
-    if app.currentScreen == 'baking':
+    if app.currentScreen == 'baking' or app.currentScreen == 'instructions3':
         if not app.draggingPizza:
             return
         for i in range(4):
@@ -438,6 +509,7 @@ def onMouseRelease(app, mouseX, mouseY):
                     app.ovens[i]['angle'] = 0
                     app.draggingPizza = None
                     return
+                
         
         if 380 <= mouseX <= 600 and 0 <= mouseY <= 50:
             app.draggingPizza = None
@@ -445,7 +517,11 @@ def onMouseRelease(app, mouseX, mouseY):
         
         if 90 <= mouseX <= 220 and 0 <= mouseY <= 110:
             app.currentPizza = app.draggingPizza
-            app.currentScreen = 'topping'
+            app.userPizzas = [app.draggingPizza]
+            if app.currentScreen == 'baking':
+                app.currentScreen = 'topping'
+            else:
+                app.currentScreen = 'instructions4'
             return
         app.draggingPizza = None
 
@@ -462,12 +538,17 @@ def onStep(app):
         if len(app.customers) < app.maxCustomers and random.random() < 0.25:
             app.customers = spawnCustomer(app)
 
-    elif app.currentScreen == 'baking':
+    elif app.currentScreen == 'baking' or app.currentScreen == 'instructions3':
         for oven in app.ovens:
             if oven['pizza']:
                 oven['timer'] += 1
                 oven['angle'] = (oven['timer'] / max(app.timerThresholds)) * 360
                 updateCrust(app, oven)
+        if app.currentScreen == 'instructions3':
+            for oven in app.ovens:
+                if oven['pizza'] and oven['pizza'].doneness == 'medium':
+                    app.currentScreen == 'instructions4'
+
 
 '''def generateNewCrusts(app):
         f = []
@@ -659,7 +740,7 @@ def calculateScore(app, customer):
             score += 3
         else:
             score += 1
-    score/= 4
+    score/= 5
     if score >= 4:
         customer.mood = 'happy'
     elif score <=2:
