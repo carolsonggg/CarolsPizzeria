@@ -6,6 +6,7 @@ Run Instructions:
 2. Navigate to the project directory
 3. Install CMU Graphics and add it to the folder 'src' (not necessary if respository is cloned)
 4. Add audio files from the folder 'audio' into 'src' (not necessary if respository is cloned)
+   - audio: https://drive.google.com/drive/folders/17cL-BU46BNEQWEDkHIBYA8dL7aTDAvnQ?usp=sharing
 5. Run the file main.py
 6. Game instructions can be found on the home page by clicking the button 'HOW TO PLAY'
 7. Have fun!!!
