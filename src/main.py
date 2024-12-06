@@ -137,14 +137,28 @@ def redrawAll(app):
     
     if app.currentScreen == 'instructions5':
         drawImage('instructions5.jpg', 0, 0, width=600, height=500)
+        if app.sauceApplied:
+            drawImage('sauce.png', 141, 155, width = 330, height = 330)
         drawToppings(app)
         drawSauceBottle(app)
         drawCutter(app)
         drawCuts(app)
         drawOrder(Order('medium', 'tomato', ['mushrooms'], 2), 476, 110)
-        if app.sauceApplied:
-            drawImage('sauce.png', 141, 155, width = 330, height = 330)
     
+    if app.currentScreen == 'instructions6':
+        drawImage('instructions6.jpg', 0, 0, width=600, height=500)
+        drawPersonWPos(app.demoCustomer)
+    
+    if app.currentScreen == 'instructions7':
+        drawImage('instructions7.jpg', 0, 0, width=600, height=500)
+        drawPersonWPos(app.demoCustomer)
+        drawImage('happy.png', 400, 260, width=30, height=10)
+        drawStar(300-180, 130, 40, 5, fill='gold')
+        drawStar(300-90, 130, 40, 5, fill='gold')
+        drawStar(300, 130, 40, 5, fill='gold')
+        drawStar(300+90, 130, 40, 5, fill='gold')
+        drawStar(300+180, 130, 40, 5, fill='gold')
+        
     if app.currentScreen == 'credits':
         drawImage('credits.jpg', 0, 0, width=600, height=500)
 
@@ -367,7 +381,6 @@ def onMousePress(app, mouseX, mouseY):
                 if app.userPizzas:
                     app.userPizzas[0].topping = topping
                 Sound('click.wav').play() 
-                
 
         cutter = app.cutter
         if (cutter['x'] - cutter['width'] / 2 <= mouseX <= cutter['x'] + cutter['width'] / 2 and
@@ -396,7 +409,17 @@ def onMousePress(app, mouseX, mouseY):
                 app.track1.play(loop = True)
             resetGame(app)
             
-
+    elif app.currentScreen == 'instructions6':
+        if 415 - 40 <= mouseX <= 415 + 40 and 280-70 <= mouseY <= 280+10:
+            app.currentScreen = 'instructions7'
+            Sound('click.wav').play() 
+            return
+    
+    elif app.currentScreen == 'instructions7':
+        if 450 <= mouseX <= 600 and 0 <= mouseY <= 60:
+            Sound('click.wav').play() 
+            resetGame(app)
+    
     elif app.currentScreen == 'judging':
         for customer in app.customers:
             if 415 - 40 <= mouseX <= 415 + 40 and 280-70 <= mouseY <= 280+10:
