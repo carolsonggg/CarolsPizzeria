@@ -6,11 +6,10 @@ This project aims to recreate the gameplay mechanics of Papa’s Pizzeria, a cla
 - An intuitive order-taking and preparation interface.
 - Drag-and-drop mechanics for topping placement.
 - A scoring system evaluating accuracy, speed, and customer satisfaction.
-- Increasing difficulty as players progress through levels.
 - Although the graphics will be simplified compared to the original game, the focus will be on accurately replicating the mechanics and maintaining engaging gameplay.
 
 Here are the current screens that will be implemented:
-1. Ordering. Here, the player will take the customers' orders with a time constraint. Possible penalty if a customer leaves due to no patience left over.
+1. Ordering. Here, the player will take the customers' orders with a time constraint.
 2. Baking. Here, the player will bake the crust in accordance to the order, ensuring not to burn it.
 3. Topping. Here, the player will put on the sauce and toppings and make the cuts necessary, in accordance to the order.
 4. Tasting. Here, the customer will give the player a score based on how well they did with the evenness of the toppings, the cuts, and how much their patience depreciated while they were waiting for their order to be taken.
@@ -31,7 +30,7 @@ To ensure regular backups, I will use GitHub for version control. A private repo
 
 Tech List
 Python: Core programming language for implementing game logic.
-CMU graphics? Pygame?
+CMU graphics: For graphics, audio, and mouse controls.
 GitHub: For version control and regular backups.
 
 Backup:
