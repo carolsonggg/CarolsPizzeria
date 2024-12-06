@@ -168,15 +168,8 @@ def redrawAll(app):
         drawPizza(app)
         drawToppings(app)
         drawSauceBottle(app)
-        #drawToppingJars(app)
         drawCutter(app)
         drawCuts(app)
-
-        #drawRect(500, 450, 80, 40, fill='blue')
-        #drawLabel('Done', 540, 470, size=16, font= 'Times New Roman')
-
-        #drawRect(100, 450, 80, 40, fill='red')
-        #drawLabel('Back', 140, 470, size=16, font= 'Times New Roman')
 
         for i in range(len(app.orders)):
             order = app.orders[i]
@@ -184,12 +177,10 @@ def redrawAll(app):
 
     elif app.currentScreen == 'judging':
         drawImage('judging.jpg', 0, 0, width=600, height=500)
-        #drawLabel('Carol\'s Pizzeria', app.width/2, 100, font='Times New Roman', size=20)
         
         for customer in app.customers:
             drawPersonWPos(customer)
 
-                
             if app.getScore:
                 drawScore(app, customer)
                 if customer.mood == 'happy':
@@ -199,19 +190,12 @@ def redrawAll(app):
                 elif customer.mood == 'meh':
                     drawLine(410, 260, 420, 260)
         
-       #drawLabel(f'Total Earnings: {app.totalEarnings}', 500, 50, font = 'Times New Roman')
-
     elif app.currentScreen == 'ordering':
         drawImage('orderingBackground.jpg', 0, 0, width=600, height=500)
-        #drawLabel('Carol\'s Pizzeria', app.width/2, 100, font='Times New Roman', size=20)
-
         for customer in app.customers:
             drawPerson(customer)
             if customer.standingStill:
                 drawOrder(customer.order, 40, 50)
-    
-        #drawRect(500, 450, 80, 40, fill='red')
-        #drawLabel('Next', 540, 470, size=16, font= 'Times New Roman')
             
     elif app.currentScreen == 'baking':
         drawImage('bakingBackground.jpg', 0, 0, width=600, height=500)
@@ -223,35 +207,18 @@ def redrawAll(app):
                 drawOven(app, x, y, app.ovens[i * 2 + j])
                 drawTimers(app, x, y, app.ovens[i * 2 + j])
             
-        #drawCircle(100, 370, 40, fill='gold', border='black')
         for i in range(len(app.readyPlate)):
             pizza = app.readyPlate[i]
             drawCircle(100 + i * 30, 370, 20, fill=pizza.color)
-        '''drawLabel('Trash Can', 450, 330, size=14, font='Times New Roman')
-        drawRect(430, 360, 40, 60, fill='gray', border='black', borderWidth=2)
-        drawRect(420, 350, 60, 10, fill='darkGray')
-        drawLine(430, 360, 470, 360, fill='black')'''
         if app.draggingPizza:
             drawCircle(app.draggingPizza.x, app.draggingPizza.y, 30, fill=app.draggingPizza.color, border='black')
-        '''for crust in app.stack:
-            drawCircle(crust['x'], crust['y'], 30, fill=crust['color'], border='black')'''
+        
         if app.currentOrder:
             drawRect(20, 200, 200, 100, fill='white', border='black')
             drawLabel(f'Crust: {app.currentOrder.doneness}', 120, 220, size=14)
             drawLabel(f'Sauce: {app.currentOrder.sauce}', 120, 240, size=14)
             drawLabel(f'Toppings: {", ".join(app.currentOrder.toppings)}', 120, 260, size=14)
             drawLabel(f'Cuts: {app.currentOrder.cuts}', 120, 280, size=14)
-
-        '''for i in range(len(app.orders)):
-            x = 30 + i * 120
-            drawRect(x, 10, 80, 60, fill='white', border='black')
-            drawLabel(f'{app.orders[i].doneness}', x + 40, 30, size=10)'''
-
-        #drawRect(500, 450, 80, 40, fill='red')
-        #drawLabel('Next', 540, 470, size=16, font='Times New Roman')
-
-        #drawRect(100, 450, 80, 40, fill='red')
-        #drawLabel('Back', 140, 470, size=16, font= 'Times New Roman')
     
         for i in range(len(app.orders)):
             order = app.orders[i]
@@ -350,7 +317,6 @@ def onMousePress(app, mouseX, mouseY):
             if oven['pizza']:
                 if oven['x']-30 <= oven['x']+30 and oven['y']-30 <= oven['y']+30:
                     app.draggingPizza = oven['pizza']
-                    #oven['pizza'] = None
                 
         if 450 <= mouseX<= 580 and 410 <= mouseY <= 445:
             Sound('click.wav').play() 
@@ -445,10 +411,6 @@ def onMousePress(app, mouseX, mouseY):
             resetJudging(app)
             Sound('click.wav').play() 
             return
-            '''app.getScore = False
-            if app.userPizzas:
-                app.userPizzas.pop(0)'''
-
 
     elif app.currentScreen == 'ordering':
         for customer in app.customers:
@@ -477,7 +439,6 @@ def onMousePress(app, mouseX, mouseY):
              
 
     elif app.currentScreen == 'baking':
-        #for pizza in reversed(app.stack):
         if abs(mouseX) < 30 and abs(mouseY) < 200:
             app.draggingPizza = Pizza()
             app.userPizzas.append(app.draggingPizza)
@@ -648,21 +609,11 @@ def onStep(app):
                     app.currentScreen = 'instructions4'
                     app.draggingPizza = oven['pizza']
 
-
-'''def generateNewCrusts(app):
-        f = []
-        for i in range(5):
-            f.append({'state': 'uncooked', 'color': 'wheat', 'x': 540, 'y': 50 + 40 * i})
-        return f'''
-
 def drawCrustStack(app):
     for i in range(4):
         drawCircle(10,0 + 40 * i, 30, fill='wheat', border='black')
 
 def drawOven(app, x, y, oven):
-    #drawCircle(x, y, 50, fill='dimGray', border='black', opacity = 100)
-    '''for i in range(-30, 40, 15):
-        drawLine(x - 40, y + i, x + 40, y + i, fill='black', lineWidth=2)'''
     if oven['pizza']:
         drawFlames(x, y)
         drawCircle(x, y, 40, fill=oven['pizza'].color)
@@ -721,16 +672,10 @@ def drawPizza(app):
 def drawToppings(app):
     for topping in app.placedToppings:
         if topping['color'] == 'black':  
-            '''drawCircle(topping['x'], topping['y'], topping['radius'], fill=topping['color'])
-            drawCircle(topping['x'], topping['y'], topping['radius']// 3, fill='sienna')'''
             drawImage('olive.png', topping['x']-5, topping['y']-5, width=20, height=20)
         elif topping['color'] == 'tan': 
-            '''drawCircle(topping['x'], topping['y'], topping['radius'], fill=topping['color'])
-            drawRect(topping['x'], topping['y'], topping['radius'], topping['radius']//2,
-                     fill='rosyBrown', align='center')'''
             drawImage('mushroom.png', topping['x']-20, topping['y']-20, width=60, height=60)
         else: 
-            #drawCircle(topping['x'], topping['y'], topping['radius'], fill=topping['color'], border='black', borderWidth=1)
             drawImage('pepperoni.png', topping['x']-25, topping['y']-25, width=60, height=60)
 
 def drawCuts(app):
@@ -740,9 +685,6 @@ def drawCuts(app):
 def drawSauceBottle(app):
     bottle = app.sauceBottle
     drawImage('bottle.png', bottle['x']-50, bottle['y']-65, width = 100, height=130)
-    '''drawRect(bottle['x'] - bottle['width'] / 2, bottle['y'] - bottle['height'] / 2,
-             bottle['width'], bottle['height'], fill='firebrick', border='black')
-    drawRect(bottle['x'], bottle['y'] - bottle['height'] / 2 - 5, bottle['width'] - 20, 10, fill ='gray', align='center')'''
 
 def drawToppingJars(app):
     for jar in app.toppingJars.values():
@@ -752,9 +694,6 @@ def drawToppingJars(app):
 def drawCutter(app):
     cutter = app.cutter
     drawImage('pizzaCutter.png', cutter['x']-51, cutter['y']-30, width=105, height=65)
-    '''drawRect(cutter['x'], cutter['y'], cutter['width'], cutter['height'], fill='darkgray', align='center')
-    bladeRadius = cutter['height']
-    drawCircle(cutter['x'] - cutter['width'] / 2 - bladeRadius + 5, cutter['y'], bladeRadius, fill='silver', border='black')'''
 
 def drawNoScore():
     drawStar(300-180, 130, 40, 5, fill='whiteSmoke')
